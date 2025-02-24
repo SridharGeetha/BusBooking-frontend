@@ -46,6 +46,34 @@ const getBusStop =async(token,busId)=>{
         throw error
         }
     }
+const payment =async(token,qty,amount)=>{
+    const formData = new FormData();
+    formData.append("amount", amount);
+    formData.append("qty", qty);
+    try {
+        const response = await axios.post(`${BASE_URL}/user/payment`,formData,{
+            headers: {Authorization: `Bearer ${token}`}
+        });
+        return response.data;
+    } catch (error) {
+        throw error
+        }
+    }
+
+    const payAmount = async(token , qty , amount)=>{
+        const formData = new FormData();
+        formData.append("amount", amount);
+        formData.append("qty", qty);
+        try {
+          const response = await axios.post(`${BASE_URL}/user/payment`, formData, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          return response.data;
+        } catch (error) {
+          throw error;
+        }
+    }
+
 const generateFare =async(token, source,destination,ticket)=>{
     const formData = new FormData();
     formData.append("source", source);
@@ -60,6 +88,8 @@ const generateFare =async(token, source,destination,ticket)=>{
         throw error
         }
     }
+
+      
 
 
     // Auth Function
@@ -92,5 +122,7 @@ export  {register,
     iaUser,
     logout,
     getBusStop,
-    generateFare
+    payAmount,
+    generateFare,
+    payment
 };

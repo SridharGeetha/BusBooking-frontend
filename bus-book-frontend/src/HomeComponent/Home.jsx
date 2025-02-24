@@ -1,8 +1,14 @@
 import React, { useEffect, useState } from 'react'
 import '/src/css/home.css'
 import { Main } from './Main'
-import axios from 'axios';
 import { getBusById, getBusStop, isAuthenticated } from '../Service/service';
+
+
+
+import { loadStripe } from '@stripe/stripe-js';
+import axios from 'axios';
+
+const stripePromise = loadStripe('pk_test_51QrBI7KitjAg8EXYAjXa2KoNdhoRvNG32SokBFmS0BjDLJICiGnTxB9loXnWhFLKvnOinrYZFxG0gX6pBYcoBgfs00QSnIvB8V');
 
   export const Home = () => {
     const [busId , setBusId] =  useState();
@@ -11,6 +17,8 @@ import { getBusById, getBusStop, isAuthenticated } from '../Service/service';
     const [startingPoint, setStartingPoint] = useState("");
     const [endingPoint, setEndingPoint] = useState("");
     const [calculatedFare, setCalculatedFare] = useState(0);
+    const[qty,setQty] = useState(1);
+    const [loading, setLoading] = useState(false);
 
     useEffect(()=>{
       if(!busId) return
@@ -60,13 +68,48 @@ import { getBusById, getBusStop, isAuthenticated } from '../Service/service';
           const endStop = busStopData.find((stop) => stop.stopName === endingPoint);
   
           if (startStop && endStop) {
-            const fareDifference = Math.abs(endStop.fareFromStart - startStop.fareFromStart);
+            const fareDifference = qty*( Math.abs(endStop.fareFromStart - startStop.fareFromStart));
             setCalculatedFare(fareDifference);
           }
         }
       }
-    }, [startingPoint, endingPoint, busStopData]);
+    }, [startingPoint, endingPoint, busStopData,qty]);
 
+    const handlePayment = async (e) => {
+      e.preventDefault();
+      setLoading(true);
+  
+      try {
+        // Call backend API
+        const response = await axios.post(
+          'http://localhost:8080/user/payment',
+          { amount: calculatedFare, qty: qty },
+          {
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+  
+        const stripe = await stripePromise;
+        const session = response.data;
+        const result = await stripe.redirectToCheckout({
+          sessionId: session.sessionId, 
+        });
+  
+        if (result.error) {
+          alert(result.error.message);
+        }
+      } catch (error) {
+        console.error('Payment error:', error);
+        alert('Failed to initiate payment.');
+      } finally {
+        setLoading(false);
+      }
+    };
+  
+  
     return (
       <>
       <Main></Main>
@@ -112,11 +155,14 @@ import { getBusById, getBusStop, isAuthenticated } from '../Service/service';
             </select>
          </div>
        </div>
+       <div>
+        <input type="number"  onChange={(e)=>setQty(e.target.value)}/>
+       </div>
        <div className='amount'>
        ${calculatedFare}
        </div>
        <div>
-       <button className="pay-button">Pay Now</button>
+       <button className="pay-button" onClick={handlePayment}>Pay Now</button>
        </div>
       </div>
       </>
