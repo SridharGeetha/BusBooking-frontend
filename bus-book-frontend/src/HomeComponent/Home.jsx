@@ -17,6 +17,7 @@ const stripePromise = loadStripe('pk_test_51QrBI7KitjAg8EXYAjXa2KoNdhoRvNG32SokB
     const [startingPoint, setStartingPoint] = useState("");
     const [endingPoint, setEndingPoint] = useState("");
     const [calculatedFare, setCalculatedFare] = useState(0);
+    const [fare, setFare] = useState(0);
     const[qty,setQty] = useState(1);
     const [loading, setLoading] = useState(false);
 
@@ -68,48 +69,57 @@ const stripePromise = loadStripe('pk_test_51QrBI7KitjAg8EXYAjXa2KoNdhoRvNG32SokB
           const endStop = busStopData.find((stop) => stop.stopName === endingPoint);
   
           if (startStop && endStop) {
-            const fareDifference = qty*( Math.abs(endStop.fareFromStart - startStop.fareFromStart));
+            const fare = ( Math.abs(endStop.fareFromStart - startStop.fareFromStart));
+            setFare(fare);
+            const fareDifference = qty * fare;
             setCalculatedFare(fareDifference);
           }
         }
       }
     }, [startingPoint, endingPoint, busStopData,qty]);
 
-    const handlePayment = async (e) => {
-      e.preventDefault();
-      setLoading(true);
-  
-      try {
-        // Call backend API
-        const response = await axios.post(
-          'http://localhost:8080/user/payment',
-          { amount: calculatedFare, qty: qty },
-          {
-            headers: {
-              'Content-Type': 'application/json',
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-  
-        const stripe = await stripePromise;
-        const session = response.data;
-        const result = await stripe.redirectToCheckout({
-          sessionId: session.sessionId, 
-        });
-  
-        if (result.error) {
-          alert(result.error.message);
+     const handlePayment = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      const token = localStorage.getItem("token");
+      const userId = 1;
+      const response = await axios.post(
+        "http://localhost:8080/user/payment",
+        null, // No body, since we're using `params`
+        {
+          params: { 
+            amount: fare, 
+            qty,
+            busId, 
+            startingPoint, 
+            endingPoint, 
+            userId 
+          },
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         }
-      } catch (error) {
-        console.error('Payment error:', error);
-        alert('Failed to initiate payment.');
-      } finally {
-        setLoading(false);
+      );
+
+      const stripe = await stripePromise;
+      const session = response.data;
+      const result = await stripe.redirectToCheckout({
+        sessionId: session.sessionId,
+      });
+
+      if (result.error) {
+        alert(result.error.message);
       }
-    };
-  
-  
+    } catch (error) {
+      console.error("Payment error:", error);
+      alert("Failed to initiate payment.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
     return (
       <>
       <Main></Main>
