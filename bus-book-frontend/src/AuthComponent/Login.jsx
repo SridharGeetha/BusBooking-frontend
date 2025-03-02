@@ -22,11 +22,12 @@ const Login = () => {
       const userData = await login(email,password);
 console.log(userData)
       if(userData.token){
-        localStorage.setItem('token',userData.token);
-        localStorage.setItem('role',userData.role);
-        localStorage.setItem('id',userData.id)
+        localStorage.setItem('token',userData.token)
+        localStorage.setItem('role',userData.role)
+        localStorage.setItem('id',userData.userId)
+        console.log(userData.userId)
         localStorage.setItem('username',userData.username)
-        console.log(userData.username)
+        console.log(userData.username)  
         console.log(userData.userId);
         if (userData.role === 'ADMIN') {
           alert("Admin ")

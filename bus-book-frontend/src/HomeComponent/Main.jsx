@@ -2,6 +2,7 @@ import React from 'react'
 import '/src/css/home.css'
 import { useNavigate } from 'react-router-dom'
 import { isAuthenticated, logout } from '../Service/service';
+import Avatar from '@mui/joy/Avatar';
 
 export const Main = () => {  
   const navigate = useNavigate();
@@ -20,6 +21,7 @@ export const Main = () => {
                     isAuthenticated() ?
                     (
                       <>
+                      <Avatar>SS</Avatar>
                       <a  href='#'>{localStorage.getItem('username')}</a>
                       {/* <a onClick={handleLogout} href='#'>Logout</a> */}
                       </>

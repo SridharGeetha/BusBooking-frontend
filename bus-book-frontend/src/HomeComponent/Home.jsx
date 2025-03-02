@@ -2,8 +2,7 @@ import React, { useEffect, useState } from 'react'
 import '/src/css/home.css'
 import { Main } from './Main'
 import { getBusById, getBusStop, isAuthenticated } from '../Service/service';
-
-
+import Button from '@mui/joy/Button';
 
 import { loadStripe } from '@stripe/stripe-js';
 import axios from 'axios';
@@ -84,10 +83,10 @@ const stripePromise = loadStripe('pk_test_51QrBI7KitjAg8EXYAjXa2KoNdhoRvNG32SokB
 
     try {
       const token = localStorage.getItem("token");
-      const userId = 1;
+      const userId = localStorage.getItem("id");
       const response = await axios.post(
         "http://localhost:8080/user/payment",
-        null, // No body, since we're using `params`
+        null, 
         {
           params: { 
             amount: fare, 
@@ -120,10 +119,12 @@ const stripePromise = loadStripe('pk_test_51QrBI7KitjAg8EXYAjXa2KoNdhoRvNG32SokB
     }
   };
 
+
     return (
       <>
+      
       <Main></Main>
-      <div className="content">
+      <div className="content" style={{ fontFamily: 'Inter, sans-serif' }}>
           <div className="search-box">
             <input type="text" placeholder="Search Bus"
             onChange={(e)=>setBusId(e.target.value)}
@@ -165,14 +166,26 @@ const stripePromise = loadStripe('pk_test_51QrBI7KitjAg8EXYAjXa2KoNdhoRvNG32SokB
             </select>
          </div>
        </div>
-       <div>
-        <input type="number"  onChange={(e)=>setQty(e.target.value)}/>
-       </div>
+       <div className='ticket-div'>
+        <input
+          type="number"
+          className="ticket-input"
+          onChange={(e) => setQty(e.target.value)}
+          min={1}
+          placeholder="Qty" />
+          </div>
        <div className='amount'>
-       ${calculatedFare}
+       ₹{calculatedFare}
        </div>
-       <div>
-       <button className="pay-button" onClick={handlePayment}>Pay Now</button>
+       <div className='pay-button-div'>
+       <Button  variant="soft" className='pay-button' onClick={handlePayment}
+        sx={{
+          padding: "6px 12px", 
+          width: "100px" 
+        }}>
+         ₹ Pay
+       </Button>
+
        </div>
       </div>
       </>
