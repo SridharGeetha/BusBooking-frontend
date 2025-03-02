@@ -1,83 +1,82 @@
-import React, { useEffect, useState } from 'react'
-import '/src/css/home.css'
-import { Main } from './Main'
+import React, { useEffect, useState } from 'react';
+import '/src/css/home.css';
+import { Main } from './Main';
 import { getBusById, getBusStop, isAuthenticated } from '../Service/service';
 import Button from '@mui/joy/Button';
+import Typography from '@mui/joy/Typography';
 
 import { loadStripe } from '@stripe/stripe-js';
 import axios from 'axios';
 
 const stripePromise = loadStripe('pk_test_51QrBI7KitjAg8EXYAjXa2KoNdhoRvNG32SokBFmS0BjDLJICiGnTxB9loXnWhFLKvnOinrYZFxG0gX6pBYcoBgfs00QSnIvB8V');
 
-  export const Home = () => {
-    const [busId , setBusId] =  useState();
-    const [busData , setBusData] =  useState();
-    const[busStopData,setbusStopData] = useState([]);
-    const [startingPoint, setStartingPoint] = useState("");
-    const [endingPoint, setEndingPoint] = useState("");
-    const [calculatedFare, setCalculatedFare] = useState(0);
-    const [fare, setFare] = useState(0);
-    const[qty,setQty] = useState(1);
-    const [loading, setLoading] = useState(false);
+export const Home = () => {
+  const [busId, setBusId] = useState();
+  const [busData, setBusData] = useState();
+  const [busStopData, setbusStopData] = useState([]);
+  const [startingPoint, setStartingPoint] = useState("");
+  const [endingPoint, setEndingPoint] = useState("");
+  const [calculatedFare, setCalculatedFare] = useState(0);
+  const [fare, setFare] = useState(0);
+  const [qty, setQty] = useState(1);
+  const [loading, setLoading] = useState(false);
 
-    useEffect(()=>{
-      if(!busId) return
+  useEffect(() => {
+    if (!busId) return;
 
-      const fetchBusStops = async () => {
-        try {
-          const token = localStorage.getItem("token");
-          const response = await getBusStop(token, busId);
-          console.log(response);
-          if (response) {
-            console.log(busStopData)
-            setbusStopData(response);
-          } else {
-            console.log("Error fetching bus stops");
-          }
-        } catch (error) {
-          console.error("Error:", error);
-        }
-      };
-  
-      fetchBusStops();
-    },[busId])
-
-    const handleSearchBus=async(e)=>{
-      // console.log(isAuthenticated);
-      if(isAuthenticated() != true){
-        alert("Please Login First")
-      }
-      e.preventDefault();
+    const fetchBusStops = async () => {
       try {
-        const token = localStorage.getItem('token');
-        // console.log(token)
-        const busData  =  await getBusById(token,busId)
-        setBusData(busData);
-        // console.log(busData)
+        const token = localStorage.getItem("token");
+        const response = await getBusStop(token, busId);
+        console.log(response);
+        if (response) {
+          console.log(busStopData);
+          setbusStopData(response);
+        } else {
+          console.log("Error fetching bus stops");
+        }
       } catch (error) {
-        console.log(error)
-        setBusData(null)
+        console.error("Error:", error);
+      }
+    };
+
+    fetchBusStops();
+  }, [busId]);
+
+  const handleSearchBus = async (e) => {
+    if (!isAuthenticated()) {
+      alert("Please Login First");
+      return;
+    }
+    e.preventDefault();
+    try {
+      const token = localStorage.getItem('token');
+      const busData = await getBusById(token, busId);
+      setBusData(busData);
+    } catch (error) {
+      console.log(error);
+      setBusData(null);
+    }
+  };
+
+  useEffect(() => {
+    if (startingPoint && endingPoint && busStopData.length > 0) {
+      if (startingPoint === endingPoint) {
+        setCalculatedFare(0);
+      } else {
+        const startStop = busStopData.find((stop) => stop.stopName === startingPoint);
+        const endStop = busStopData.find((stop) => stop.stopName === endingPoint);
+
+        if (startStop && endStop) {
+          const fare = Math.abs(endStop.fareFromStart - startStop.fareFromStart);
+          setFare(fare);
+          setCalculatedFare(qty * fare);
+        }
       }
     }
-    useEffect(() => {
-      if (startingPoint && endingPoint && busStopData.length > 0) {
-        if (startingPoint === endingPoint) {
-          setCalculatedFare(0);
-        } else {
-          const startStop = busStopData.find((stop) => stop.stopName === startingPoint);
-          const endStop = busStopData.find((stop) => stop.stopName === endingPoint);
-  
-          if (startStop && endStop) {
-            const fare = ( Math.abs(endStop.fareFromStart - startStop.fareFromStart));
-            setFare(fare);
-            const fareDifference = qty * fare;
-            setCalculatedFare(fareDifference);
-          }
-        }
-      }
-    }, [startingPoint, endingPoint, busStopData,qty]);
+  }, [startingPoint, endingPoint, busStopData, qty]);
 
-     const handlePayment = async (e) => {
+  const handlePayment = async (e) => {
     e.preventDefault();
     setLoading(true);
 
@@ -86,16 +85,9 @@ const stripePromise = loadStripe('pk_test_51QrBI7KitjAg8EXYAjXa2KoNdhoRvNG32SokB
       const userId = localStorage.getItem("id");
       const response = await axios.post(
         "http://localhost:8080/user/payment",
-        null, 
+        null,
         {
-          params: { 
-            amount: fare, 
-            qty,
-            busId, 
-            startingPoint, 
-            endingPoint, 
-            userId 
-          },
+          params: { amount: fare, qty, busId, startingPoint, endingPoint, userId },
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -104,9 +96,7 @@ const stripePromise = loadStripe('pk_test_51QrBI7KitjAg8EXYAjXa2KoNdhoRvNG32SokB
 
       const stripe = await stripePromise;
       const session = response.data;
-      const result = await stripe.redirectToCheckout({
-        sessionId: session.sessionId,
-      });
+      const result = await stripe.redirectToCheckout({ sessionId: session.sessionId });
 
       if (result.error) {
         alert(result.error.message);
@@ -119,25 +109,29 @@ const stripePromise = loadStripe('pk_test_51QrBI7KitjAg8EXYAjXa2KoNdhoRvNG32SokB
     }
   };
 
-
-    return (
-      <>
-      
-      <Main></Main>
+  return (
+    <>
+      <Main />
       <div className="content" style={{ fontFamily: 'Inter, sans-serif' }}>
-          <div className="search-box">
-            <input type="text" placeholder="Search Bus"
-            onChange={(e)=>setBusId(e.target.value)}
-            />
-            <button onClick={handleSearchBus}>Search</button>
-          </div>
-          <div className='route-div'>
-            <h2 className='route'>Route : <span className="route-name">{busData ? busData.route : 'No Route'}</span></h2>
-          </div>
-          <div className="form-container">
-         <div className="form-group">
-           <label htmlFor="starting-point">Starting Point :</label>
-           <select id="starting-point" onChange={(e)=>setStartingPoint(e.target.value)}>
+        <div className="search-box">
+          <input type="text" placeholder="Search Bus" onChange={(e) => setBusId(e.target.value)} />
+          <button onClick={handleSearchBus}>
+            Search
+          </button>
+        </div>
+
+        <div className="route-div">
+          <h2 level="h2" className="route">
+            Route : <span className="route-name">{busData ? busData.route : 'No Route'}</span>
+          </h2>
+        </div>
+
+        <div className="form-container">
+          <div className="form-group">
+            <Typography level="body-md" component="label" htmlFor="starting-point">
+              Starting Point :
+            </Typography>
+            <select id="starting-point" onChange={(e) => setStartingPoint(e.target.value)}>
               <option value="">Source</option>
               {busStopData.length > 0 ? (
                 busStopData.map((busStop) => (
@@ -149,10 +143,13 @@ const stripePromise = loadStripe('pk_test_51QrBI7KitjAg8EXYAjXa2KoNdhoRvNG32SokB
                 <option disabled>No Stops Available</option>
               )}
             </select>
-         </div>
-         <div className="form-group">
-           <label htmlFor="ending-point">Ending Point :</label>
-           <select id="ending-point" onChange={(e)=>setEndingPoint(e.target.value)}>
+          </div>
+
+          <div className="form-group">
+            <Typography level="body-md" component="label" htmlFor="ending-point">
+              Ending Point :
+            </Typography>
+            <select id="ending-point" onChange={(e) => setEndingPoint(e.target.value)}>
               <option value="">Destination</option>
               {busStopData.length > 0 ? (
                 busStopData.map((busStop) => (
@@ -164,30 +161,34 @@ const stripePromise = loadStripe('pk_test_51QrBI7KitjAg8EXYAjXa2KoNdhoRvNG32SokB
                 <option disabled>No Stops Available</option>
               )}
             </select>
-         </div>
-       </div>
-       <div className='ticket-div'>
-        <input
-          type="number"
-          className="ticket-input"
-          onChange={(e) => setQty(e.target.value)}
-          min={1}
-          placeholder="Qty" />
           </div>
-       <div className='amount'>
-       ₹{calculatedFare}
-       </div>
-       <div className='pay-button-div'>
-       <Button  variant="soft" className='pay-button' onClick={handlePayment}
-        sx={{
-          padding: "6px 12px", 
-          width: "100px" 
-        }}>
-         ₹ Pay
-       </Button>
+        </div>
 
-       </div>
+        <div className="ticket-div">
+          <input
+            type="number"
+            className="ticket-input"
+            onChange={(e) => setQty(e.target.value)}
+            min={1}
+            placeholder="Qty"
+          />
+        </div>
+
+        <div className="amount">
+          ₹{calculatedFare}
+        </div>
+
+        <div className="pay-button-div">
+          <Button
+            variant="soft"
+            className="pay-button"
+            onClick={handlePayment}
+            sx={{ padding: "6px 12px", width: "100px" }}
+          >
+             ₹ Pay
+          </Button>
+        </div>
       </div>
-      </>
-    )
-  }
+    </>
+  );
+};
