@@ -2,9 +2,16 @@ import React, { useEffect, useState } from 'react';
 import '/src/css/home.css';
 import { Main } from './Main';
 import { getBusById, getBusStop, isAuthenticated } from '../Service/service';
-import Button from '@mui/joy/Button';
-import Typography from '@mui/joy/Typography';
-
+import {
+  Button,
+  Typography,
+  Select,
+  Option,
+  Input,
+  CircularProgress,
+  Alert,
+} from '@mui/joy';
+import NoTransferIcon from '@mui/icons-material/NoTransfer';
 import { loadStripe } from '@stripe/stripe-js';
 import axios from 'axios';
 
@@ -122,7 +129,7 @@ export const Home = () => {
 
         <div className="route-div">
           <h2 level="h2" className="route">
-            Route : <span className="route-name">{busData ? busData.route : 'No Route'}</span>
+            <span className="route-name">{busData ?(" Route :"+busData.route ): <NoTransferIcon sx={{marginTop:'20px'}}/>}</span>
           </h2>
         </div>
 
@@ -164,28 +171,32 @@ export const Home = () => {
           </div>
         </div>
 
-        <div className="ticket-div">
-          <input
+        <div style={{ display: 'flex', gap: '20px', marginBottom: '20px' }}>
+          <Input
             type="number"
-            className="ticket-input"
+            placeholder="Quantity"
+            value={qty}
             onChange={(e) => setQty(e.target.value)}
             min={1}
-            placeholder="Qty"
+            sx={{ width: '120px' }}
           />
-        </div>
+          </div>
 
-        <div className="amount">
-          ₹{calculatedFare}
+        <div >
+        <Typography level="body-lg" sx={{ alignSelf: 'center' }}>
+            Total Fare: <strong>₹{calculatedFare}</strong>
+          </Typography>
         </div>
 
         <div className="pay-button-div">
-          <Button
+        <Button
             variant="soft"
-            className="pay-button"
+            color="primary"
             onClick={handlePayment}
-            sx={{ padding: "6px 12px", width: "100px" }}
+            disabled={!startingPoint || !endingPoint || calculatedFare <= 0 || loading}
+            sx={{ width: '150px' }}
           >
-             ₹ Pay
+            {loading ? <CircularProgress size="sm" /> : '₹ Pay Now'}
           </Button>
         </div>
       </div>

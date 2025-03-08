@@ -9,6 +9,9 @@ import Menu from "@mui/joy/Menu";
 import MenuButton from "@mui/joy/MenuButton";
 import MenuItem from "@mui/joy/MenuItem";
 import MoreVert from "@mui/icons-material/MoreVert";
+import DirectionsBusIcon from '@mui/icons-material/DirectionsBus';
+import LoginIcon from '@mui/icons-material/Login';
+
 import Typography from '@mui/joy/Typography';
 
 export const Main = () => {
@@ -39,7 +42,7 @@ export const Main = () => {
         <div>
           <header>
             <nav className="navbar">
-              <h3 className="title">Online Local Bus Booking System</h3>
+              <h3 className="title"><DirectionsBusIcon/> Online Local Bus Booking System</h3>
               {isAuthenticated() ? (
                 <>
                   <div
@@ -70,8 +73,8 @@ export const Main = () => {
                 </>
               ) : (
                 <>
-                  <a onClick={handleLogin}>
-                    Login
+                  <a onClick={handleLogin} style={{cursor:'pointer'}}>
+                    <LoginIcon color="primary"/>
                   </a>
                 </>
               )}

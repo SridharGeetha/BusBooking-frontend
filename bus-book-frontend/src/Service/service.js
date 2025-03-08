@@ -10,7 +10,6 @@ export const login =async(email,password)=>{
     }
     }
 
-    
 const register =async(userData)=>{
     try {
         const response = await axios.post(BASE_URL+"/auth/add-new-user",userData,{
@@ -45,7 +44,60 @@ const getBusStop =async(token,busId)=>{
     } catch (error) {
         throw error
         }
+    }   
+    const getAllBusData =async(token)=>{
+        
+        try {
+            const response = await axios.get(`${BASE_URL}/adminuser/get-all-bus`,{
+                headers: {Authorization: `Bearer ${token}`}
+            });
+            return response.data;
+        } catch (error) {
+            throw error
+        }
     }
+
+    const AddNewBus = async (busId,route, startPoint, destination, totalFare, token) => {
+        try {
+          const formData = new FormData();
+          formData.append("busId",busId)
+          formData.append("route",route);
+          formData.append("startPoint",startPoint);
+          formData.append("destination",destination);
+          formData.append("totalFare",totalFare);
+      
+          const response = await axios.post(`${BASE_URL}/admin/add-new-bus`, formData, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              
+            }
+          });
+      
+          return response.data;
+        } catch (error) {
+          throw error;
+        }
+      };
+      
+    const AddbusStop=async(stopName,fare,busId ,token)=>{
+        try {
+            const formData = new FormData();
+            formData.append("busId",busId)
+            formData.append("stopName",stopName)
+            formData.append("fare",fare)
+            const response = await axios.post(`${BASE_URL}/admin/add-new-bus-stop`,formData,{
+            headers: {Authorization: `Bearer ${token}`}
+            })
+            return response.data;
+            
+        } catch (error) {
+            throw error
+        }
+    }
+
+
+
+    // payment
 const payment =async(token,qty,amount)=>{
     const formData = new FormData();
     formData.append("amount", amount);
@@ -106,13 +158,25 @@ const generateFare =async(token, source,destination,ticket)=>{
         localStorage.removeItem('username');
     }
 
-    const isAdmin = ()=>{
-        const role = localStorage.getItem('role');
-        return role == 'ADMIN'
-    }
+const isAdmin = () => {
+    const role = localStorage.getItem('role');
+        if(role === 'ADMIN'){
+            return true;
+        }else{
+            return false;
+        }
+    };
+const notAdmin = () => {
+    const role = localStorage.getItem('role');
+        if(role != 'ADMIN'){
+            return true;
+        }else{
+            return false;
+        }
+    };
     const iaUser = ()=>{
         const role = localStorage.getItem('role');
-        return role == 'ADMIN'
+        return role == 'USER'
     }
 
 export  {register,
@@ -121,8 +185,12 @@ export  {register,
     isAdmin,
     iaUser,
     logout,
+    notAdmin,
     getBusStop,
     payAmount,
     generateFare,
+    getAllBusData,
+    AddNewBus,
+    AddbusStop,
     payment
 };

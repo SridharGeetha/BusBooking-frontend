@@ -8,7 +8,7 @@ import FormHelperText from '@mui/joy/FormHelperText';
 import Stack from '@mui/joy/Stack';
 import Alert from '@mui/joy/Alert';
 import InfoOutlined from '@mui/icons-material/InfoOutlined';
-import { login } from '../Service/service';
+import { iaUser, isAdmin, login } from '../Service/service';
 import Link from '@mui/joy/Link';
 
 const Login = () => {
@@ -47,10 +47,10 @@ const Login = () => {
         localStorage.setItem('id', userData.userId);
         localStorage.setItem('username', userData.username);
 
-        if (userData.role === 'ADMIN') {
-          alert('Admin Login');
-        } else {
-          navigate('/');
+        if (userData.role == "ADMIN") {
+          navigate('/admin')
+        } else if(iaUser()){
+          navigate('/')
         }
       }
     } catch (err) {
