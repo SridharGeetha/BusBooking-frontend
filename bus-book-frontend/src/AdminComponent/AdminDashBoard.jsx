@@ -241,6 +241,7 @@ export const AdminDashBoard = () => {
             <CardContent>
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                 <DirectionsBus fontSize="large" />
+                <Typography variant='h6'> {bus.busId}.</Typography>
                 <Typography variant="h6">{bus.route}</Typography>
                 <SvgIcon onClick={() => handleBusExpand(bus.busId)} color='primary'>
                   {busExpanded[bus.busId] ? <KeyboardArrowUpIcon/> : <KeyboardArrowDownIcon/>}
@@ -287,7 +288,8 @@ export const AdminDashBoard = () => {
                     <List>
                       {busStops[bus.busId].map((stop) => (
                         <ListItem key={stop.stopId}>
-                          <ListItemText primary={stop.stopName} secondary={`Fare: ${stop.fareFromStart}`} />
+                          
+                          <ListItemText  primary={stop.stopId+". "+stop.stopName} secondary={`Fare: ${stop.fareFromStart}`} />
                         </ListItem>
                       ))}
                     </List>
