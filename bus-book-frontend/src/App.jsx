@@ -24,6 +24,7 @@ function App() {
 
   return (
     <>
+
     <BrowserRouter>
     <Routes>
         <Route path='/' element={<Home/>}></Route>
@@ -48,8 +49,8 @@ function App() {
         <Route path="/admin" element={<ProtectedRoute element={AdminDashBoard} />} />
         <Route path="/no-access" element={<NoAccess/>}/>
     </Routes>
+
     </BrowserRouter>
-    
     </>
   )
 }

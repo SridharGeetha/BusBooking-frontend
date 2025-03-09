@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios, { formToJSON } from "axios";
 const BASE_URL = "http://localhost:8080";
 
 export const login =async(email,password)=>{
@@ -78,6 +78,19 @@ const getBusStop =async(token,busId)=>{
           throw error;
         }
       };
+
+      const updateBusData = async(token,busId,busData)=>{
+        try {
+            const response = await axios.put(`${BASE_URL}/admin/update/bus/${busId}`,busData,{
+                headers:{
+                    Authorization:`Bearer ${token}`,
+                }
+            })
+            return response.data;
+        } catch (error) {
+            throw  error
+        }
+      }
       
     const AddbusStop=async(stopName,fare,busId ,token)=>{
         try {
@@ -95,6 +108,31 @@ const getBusStop =async(token,busId)=>{
         }
     }
 
+    const updateBusStopData = async(token,busStopId,busStopData)=>{
+        try {
+            const response = await axios.put(`${BASE_URL}/admin/update/bus/stop/${busStopId}`,busStopData,{
+                headers:{
+                    Authorization:`Bearer ${token}`,
+                }
+            })
+            return response.data;
+        } catch (error) {
+            throw  error
+        }
+      }
+
+      const deleteBusStopData = async(token , busStopId)=>{
+        try {
+            const response = await axios.delete(`${BASE_URL}/admin/bus/stop/delete/${busStopId}`,{
+                headers:{
+                    Authorization:`Bearer ${token}`,
+                }
+            })
+            return response.data;
+        } catch (error) {
+           throw error 
+        }
+      }
 
 
     // payment
@@ -192,5 +230,8 @@ export  {register,
     getAllBusData,
     AddNewBus,
     AddbusStop,
-    payment
+    payment,
+    updateBusData,
+    updateBusStopData,
+    deleteBusStopData
 };

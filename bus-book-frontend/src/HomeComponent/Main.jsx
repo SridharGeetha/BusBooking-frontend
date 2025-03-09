@@ -1,7 +1,7 @@
 import React from "react";
 import "/src/css/home.css";
 import { useNavigate } from "react-router-dom";
-import { isAuthenticated, logout } from "../Service/service";
+import { isAdmin, isAuthenticated, logout } from "../Service/service";
 import Avatar from "@mui/joy/Avatar";
 import Dropdown from "@mui/joy/Dropdown";
 import IconButton from "@mui/joy/IconButton";
@@ -11,8 +11,7 @@ import MenuItem from "@mui/joy/MenuItem";
 import MoreVert from "@mui/icons-material/MoreVert";
 import DirectionsBusIcon from '@mui/icons-material/DirectionsBus';
 import LoginIcon from '@mui/icons-material/Login';
-
-import Typography from '@mui/joy/Typography';
+import Tooltip from '@mui/material/Tooltip';
 
 export const Main = () => {
   const navigate = useNavigate();
@@ -36,6 +35,10 @@ export const Main = () => {
     alert('logout success')
   }
 
+  const handleDashBoard = ()=>{
+    navigate("/admin")
+  }
+
   return (
     <>
       <div className="main">
@@ -53,8 +56,12 @@ export const Main = () => {
                       marginLeft: "20px",
                     }}
                   >
-                    <Avatar>{initials}</Avatar>
+                    <Tooltip title={username} arrow>
+                      <Avatar>{initials}</Avatar>
+                    </Tooltip>
+                    
                     <Dropdown>
+                      <Tooltip title="More" arrow>
                       <MenuButton
                         slots={{ root: IconButton }}
                         slotProps={{
@@ -63,8 +70,11 @@ export const Main = () => {
                       >
                         <MoreVert />
                       </MenuButton>
+                        </Tooltip>
                       <Menu>
-                        <MenuItem >My account</MenuItem>
+                        {
+                          isAdmin() && <MenuItem style={{color:"blue"}} onClick={handleDashBoard}>Dashboard</MenuItem>
+                        }
                         <MenuItem>History</MenuItem>
                         <MenuItem style={{color:"red"}} onClick={handleLogout}>Logout</MenuItem>
                       </Menu>
