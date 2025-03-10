@@ -47,7 +47,7 @@ function App() {
 
 
         <Route path="/admin" element={<ProtectedRoute element={AdminDashBoard} />} />
-        <Route path="/no-access" element={<NoAccess/>}/>
+        <Route path="*" element={<NoAccess/>}/>
     </Routes>
 
     </BrowserRouter>

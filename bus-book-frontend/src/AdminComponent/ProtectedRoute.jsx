@@ -8,7 +8,7 @@ const ProtectedRoute = ({ element: Element }) => {
   if (isAdmin()) {
     return <Element />; 
   } else {
-    return <Navigate to="/no-access" replace />; 
+    return <Navigate to="*" replace />; 
   }
 };
 
