@@ -164,8 +164,9 @@ const payment =async(token,qty,amount)=>{
         }
     }
 
-const generateFare =async(token, source,destination,ticket)=>{
+const generateFare =async(token,busId, source,destination,ticket)=>{
     const formData = new FormData();
+    formData.append("busId", busId);
     formData.append("source", source);
     formData.append("destination", destination);
     formData.append("ticket", ticket);

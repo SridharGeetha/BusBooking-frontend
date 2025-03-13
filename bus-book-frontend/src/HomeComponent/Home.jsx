@@ -35,7 +35,6 @@ export const Home = () => {
       try {
         const token = localStorage.getItem("token");
         const response = await getBusStop(token, busId);
-        console.log(response);
         if (response) {
           console.log(busStopData);
           setbusStopData(response);
@@ -143,13 +142,14 @@ export const Home = () => {
               {busStopData.length > 0 ? (
                 busStopData.map((busStop) => (
                   <option key={busStop.stopId} value={busStop.stopName}>
-                    {busStop.stopName}
+                   {busStop.stopName}
                   </option>
                 ))
               ) : (
                 <option disabled>No Stops Available</option>
               )}
             </select>
+
           </div>
 
           <div className="form-group">
@@ -161,7 +161,7 @@ export const Home = () => {
               {busStopData.length > 0 ? (
                 busStopData.map((busStop) => (
                   <option key={busStop.stopId} value={busStop.stopName}>
-                    {busStop.stopName}
+                   {busStop.stopName}
                   </option>
                 ))
               ) : (
