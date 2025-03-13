@@ -25,13 +25,15 @@ export const Main = () => {
 
   const initials = getInitial(username);
 
+
+
   const handleLogin = () => {
     navigate("/login");
   };
 
   const handleLogout = () =>{
     logout();
-   console.log( localStorage.getItem('username'))
+   
     alert('logout success')
   }
 

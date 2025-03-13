@@ -34,6 +34,8 @@ export const Home = () => {
     const fetchBusStops = async () => {
       try {
         const token = localStorage.getItem("token");
+        console.log(token)
+        localStorage.setItem('tt',token)
         const response = await getBusStop(token, busId);
         if (response) {
           console.log(busStopData);
@@ -88,6 +90,7 @@ export const Home = () => {
 
     try {
       const token = localStorage.getItem("token");
+      localStorage.setItem("newToken",token)
       const userId = localStorage.getItem("id");
       const response = await axios.post(
         "http://localhost:8080/user/payment",

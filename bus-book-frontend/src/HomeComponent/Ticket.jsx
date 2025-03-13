@@ -10,6 +10,7 @@ import {
 } from "@mui/material";
 import ConfirmationNumberIcon from "@mui/icons-material/ConfirmationNumber";
 
+
 export const Ticket = () => {
   const [searchParams] = useSearchParams();
   const [ticketDetails, setTicketDetails] = useState(null);
@@ -22,12 +23,20 @@ export const Ticket = () => {
   const qty = searchParams.get("qty");
   const userId = searchParams.get("userId");
 
+
+  // const token = sessionStorage.getItem('token');
   useEffect(() => {
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem('token');
+    console.log("Local Storage Contents:", JSON.stringify(localStorage));
+    console.log("token",token)
+    if (!token) {
+      console.error("Token is missing! Please check localStorage.");
+      return;
+    }
     const bookedSession = localStorage.getItem(`booked_${sessionId}`); 
   
     if (bookedSession) {
-      setTicketDetails(JSON.parse(bookedSession));  // Load from localStorage
+      setTicketDetails(JSON.parse(bookedSession));  
       setLoading(false);
     } else if (sessionId) {
       axios

@@ -191,10 +191,16 @@ const generateFare =async(token,busId, source,destination,ticket)=>{
     }
 
     const logout = ()=>{
+        localStorage.clear();
         localStorage.removeItem('token');
         localStorage.removeItem('role');
         localStorage.removeItem('id');
         localStorage.removeItem('username');
+    }
+
+    const getToken =()=>{
+        console.log(localStorage.getItem('token'))
+        return localStorage.getItem('token');
     }
 
 const isAdmin = () => {
@@ -234,5 +240,6 @@ export  {register,
     payment,
     updateBusData,
     updateBusStopData,
-    deleteBusStopData
+    deleteBusStopData,
+    getToken
 };
